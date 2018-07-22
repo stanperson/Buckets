@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 
 public class Buckets {
-
+    public static BucketConfiguration bucketConfiguration = new BucketConfiguration();
     /*
     Read a CSV file from Fidelity that has current portfolio.
      */
@@ -77,7 +77,46 @@ public class Buckets {
     }
 
 
+
+    private static List<String> readPortfolioPlan(String name) {
+
+        File file= new File(name);
+
+        // this gives you a 2-dimensional array of strings
+        List<String> lines = new ArrayList<>();
+        Scanner inputStream;
+
+        try{
+            inputStream = new Scanner(file);
+
+            while(inputStream.hasNextLine()){
+                String line= inputStream.nextLine();
+                if (line.isEmpty()) break;
+                System.out.println( line);
+                lines.add(line);
+            }
+
+            inputStream.close();
+        }catch (FileNotFoundException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        return lines;
+
+    }
+
     public static void main(String[] args) {
+
+        String portfolioPlanPath = "/Users/stanperson/Downloads/PortfolioPlan.csv";
+        List <String> portfolioPlan = readPortfolioPlan(portfolioPlanPath);
+
+        for (String line : portfolioPlan) {
+            System.out.println(line);
+            bucketConfiguration.add(line);
+        }
+        bucketConfiguration.print();
+
         List<String> portfolioCSV;
         System.out.println( "Reading from: " + args[0]);
         portfolioCSV = readFidelityCSV(args[0]);
