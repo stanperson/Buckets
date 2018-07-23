@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 
 public class Buckets {
     public static BucketConfiguration bucketConfiguration = new BucketConfiguration();
+
+
     /*
     Read a CSV file from Fidelity that has current portfolio.
      */
@@ -104,20 +106,53 @@ public class Buckets {
         return lines;
 
     }
+    private static ArrayList<String> listFilesForFolder(final File folder) {
+        ArrayList<String> files = new ArrayList<String>();
+        for (final File fileEntry : folder.listFiles()) {
+            if (fileEntry.isDirectory()) {
+                // ignore directories for this simple case
+                // listFilesForFolder(fileEntry);
+            } else {
+                //System.out.println(fileEntry.getName());
+                files.add(fileEntry.getName());
+
+            }
+        }
+        return files;
+    }
 
     public static void main(String[] args) {
 
-        String portfolioPlanPath = "/Users/stanperson/Downloads/PortfolioPlan.csv";
-        List <String> portfolioPlan = readPortfolioPlan(portfolioPlanPath);
+        // this is where the Portfolio_Position* and PositionPlan files are stored
+        String portfolioPlanPath = "/Users/stanperson/Desktop/PortfolioPositions/";
 
-        // from the list of strings, build a a buckcondiguration (InvestmentAllocations)
+        File f = new File(portfolioPlanPath);
+        ArrayList<String> files = listFilesForFolder(f);
+
+
+        //find the Portfolio_Position-mmm-dd-yyyy.csv file that is in this directory
+        String positionFileName = "not found";
+        for (String name: files) {
+            if (name.startsWith("Portfolio_Position")) {
+                positionFileName = name;
+                break;
+            }
+        }
+
+        if (positionFileName.equalsIgnoreCase("not found")) {
+            System.out.println("Portfolio_Position file not found in directory:/Users/stanperson/Desktop/PortfolioPositions" );
+            System.exit(-1);
+        }
+
+        List <String> portfolioPlan = readPortfolioPlan(portfolioPlanPath + "PortfolioPlan.csv");
+
+        // from the list of strings, build a a bucketconfiguration (InvestmentAllocations)
         for (String line : portfolioPlan) {
             bucketConfiguration.add(line);
         }
-        bucketConfiguration.print();
 
         List<String> portfolioCSV;
-        System.out.println( "Reading from: " + args[0]);
+        System.out.println( "Reading from: " + portfolioPlanPath + positionFileName);
         portfolioCSV = readFidelityCSV(args[0]);
         int lineNo = 1;
 
@@ -137,6 +172,43 @@ public class Buckets {
             }
             lineNo++;
         }
+        // verify that everything in the portfolio plan is also in the portfolio.
+        // note that the portfolio content is driven by the file from Fidelity. The plan may have things not in currently in
+        // the Fidelity Portfolio.
+        List<Investment> invs = portfolio.getInvestments();
+        ArrayList<InvestmentAllocation> alls = bucketConfiguration.getAllocations();
+        for (InvestmentAllocation allocation: alls) {
+            String allocationTicker = allocation.getTicker();
+            Investment i =portfolio.get(allocationTicker);
+            if (portfolio.get( allocationTicker) == null ){
+                // the portfolio does not have anything for this allocation
+                System.out.println("adding investment for : " + allocationTicker);
+                Investment newInv = new Investment();
+                newInv.setSymbol(allocationTicker);
+                newInv.setDescription(allocation.getDescription());
+                if (allocation.isSplit()) {
+                    System.out.println("Can't handle split defaults from allocations.Pick a bucket." + allocation.toString());
+                } else {
+                    //find first non zero bucket percentage.
+                    int bucketId = 1;
+                    Double bucketPct = allocation.getBucket1Pct();
+                    if ( bucketPct == 0.) {
+                        bucketPct = allocation.getBucket2Pct();
+                        bucketId++;
+                        if (bucketPct == 0.) {
+                            bucketPct = allocation.getBucket3Pct();
+                            bucketId++;
+                        }
+                    }
+                    newInv.setTargetPct(bucketPct);
+                    portfolio.add(newInv);
+                }
+
+
+
+            }
+
+        }
         System.out.println( "Portfolio:" + dateDownloaded);
         portfolio.print();
         ;
@@ -144,7 +216,7 @@ public class Buckets {
         portfolio.bucketize(bucketConfiguration);
 
         System.out.println ("Buckets");
-        portfolio.printBuckets();
+        portfolio.printBuckets(bucketConfiguration);
 
     }
 

@@ -21,6 +21,7 @@ public class Portfolio {
 
     {
         // put some stub investments into the portfolio
+        /*
         Investment inv = new Investment();
         inv.setSymbol("FNMIX");
         inv.setDescription("Fidelity New Markets Income Fund");
@@ -36,7 +37,7 @@ public class Portfolio {
         inv.setDescription("Fidelity Floating Rate High Income Fund");
         investments.add(inv);
         inv.setTargetPct(7.5);
-
+*/
 
     }
 
@@ -45,14 +46,10 @@ public class Portfolio {
         // for the same bucket. I guess. :)
         String ticker = investment.getSymbol();
         Investment inv2 = this.get(ticker);
-        String ticker2 = "";
+
         if ( inv2 != null ) {
             // there is a matching symbol in the set. Merge the two investments.
-            System.out.println("Merging");
-            System.out.println(investment.toString());
-            System.out.println(inv2.toString());
-            System.out.println("Merged");
-            System.out.println((inv2.merge(investment)).toString());
+            inv2.merge(investment);
 
         } else
             investments.add(investment);
@@ -62,6 +59,9 @@ public class Portfolio {
     public Investment get(int index) {
        return investments.get(index);
 
+    }
+    public List<Investment> getInvestments() {
+        return investments;
     }
 
     public void bucketize(BucketConfiguration bucketConfiguration) {
@@ -141,20 +141,20 @@ public class Portfolio {
         return returnString;
     }
 
-    public void printBuckets() {
+    public void printBuckets(BucketConfiguration bucketConfiguration) {
         Double sizeWOAnnuity = portfolioSize - annuity.getBucketSize();
 
         System.out.println ("Portfolio Size: " + String.format("%.2f", portfolioSize));
         System.out.println ("Cost Basis: " + String.format("%.2f", portfolioBasis));
         System.out.println ("Unrealized Profits: " + String.format("%.2f", (portfolioSize -portfolioBasis)));
         System.out.println ("+");
-        System.out.println (" Bucket1: " + String.format("%.2f", bucket1.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket1.getBucketSize()/sizeWOAnnuity) + " Target: 10%"+ " Out of balance by: "+ String.format("%.2f", (.1 * sizeWOAnnuity) - bucket1.getBucketSize()) );
+        System.out.println (" Bucket1: " + String.format("%.2f", bucket1.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket1.getBucketSize()/sizeWOAnnuity) + " Target: " + String.format("%.1f", 100.* bucketConfiguration.getBucketFractionOfPortfolio(0)) + " Out of balance by: "+ String.format("%.2f", (.1 * sizeWOAnnuity) - bucket1.getBucketSize()) );
         bucket1.printBucket(sizeWOAnnuity);
         System.out.println ("+");
-        System.out.println (" Bucket2: " + String.format("%.2f", bucket2.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket2.getBucketSize()/sizeWOAnnuity) + " Target: 55%");
+        System.out.println (" Bucket2: " + String.format("%.2f", bucket2.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket2.getBucketSize()/sizeWOAnnuity) + " Target: " + String.format("%.1f",100* bucketConfiguration.getBucketFractionOfPortfolio(1) ));
         bucket2.printBucket(sizeWOAnnuity);
         System.out.println ("+");
-        System.out.println (" Bucket3: " + String.format("%.2f", bucket3.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket3.getBucketSize()/sizeWOAnnuity) + " Target: 35%");
+        System.out.println (" Bucket3: " + String.format("%.2f", bucket3.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket3.getBucketSize()/sizeWOAnnuity) + " Target:  " + String.format("%.1f",100* bucketConfiguration.getBucketFractionOfPortfolio(2)));
         bucket3.printBucket(sizeWOAnnuity);
         System.out.println ("+");
         System.out.println (" Unbucketed: " + String.format("%.2f", unBucketed.getBucketSize()));
