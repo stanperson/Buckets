@@ -110,6 +110,7 @@ public class Buckets {
         String portfolioPlanPath = "/Users/stanperson/Downloads/PortfolioPlan.csv";
         List <String> portfolioPlan = readPortfolioPlan(portfolioPlanPath);
 
+        // from the list of strings, build a a buckcondiguration (InvestmentAllocations)
         for (String line : portfolioPlan) {
             bucketConfiguration.add(line);
         }
@@ -140,7 +141,7 @@ public class Buckets {
         portfolio.print();
         ;
 
-        portfolio.bucketize();
+        portfolio.bucketize(bucketConfiguration);
 
         System.out.println ("Buckets");
         portfolio.printBuckets();

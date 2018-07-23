@@ -69,11 +69,11 @@ public class Investment {
         targetPct = 0.0;
     }
 
-    public void sell(Double pct) {
+    public void sell(Double fraction) {
 
-        this.quantity= (pct * this.quantity)/100;
-        this.currValue = (pct* this.currValue)/100;
-        this.costBasis = (pct * this.costBasis)/100;
+        this.quantity= (fraction * this.quantity);
+        this.currValue = (fraction* this.currValue);
+        this.costBasis = (fraction * this.costBasis);
     }
 
     public Double getTargetPct() {

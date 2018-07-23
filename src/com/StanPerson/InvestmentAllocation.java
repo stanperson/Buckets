@@ -6,6 +6,34 @@ public class InvestmentAllocation {
     private Double bucket1Pct;
     private Double bucket2Pct;
     private Double bucket3Pct;
+    private boolean split = false;
+    private Double bucket2AllocationPct;
+    private Double bucket3AllocationPct;
+    public boolean isSplit() {
+        return split;
+    }
+
+    public void setSplit(boolean split) {
+        this.split = split;
+    }
+
+    public Double getBucket2AllocationPct() {
+        return bucket2AllocationPct;
+    }
+
+    public void setBucket2AllocationPct(Double bucket2AllocationPct) {
+        this.bucket2AllocationPct = bucket2AllocationPct;
+    }
+
+    public Double getBucket3AllocationPct() {
+        return bucket3AllocationPct;
+    }
+
+    public void setBucket3AllocationPct(Double bucket3Allocation) {
+        this.bucket3AllocationPct = bucket3Allocation;
+    }
+
+
 
     public String getTicker() {
         return ticker;

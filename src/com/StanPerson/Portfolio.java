@@ -8,19 +8,18 @@ import java.util.List;
 
 public class Portfolio {
 
-    private List<Investment> investments;
+    private List<Investment> investments = new ArrayList<>();
     private Bucket bucket1 = new Bucket("1");
     private Bucket bucket2 = new Bucket("2");
     private Bucket bucket3 = new Bucket("3");
     private Bucket annuity  = new Bucket("4");
+    private Bucket unBucketed = new Bucket("5");
     private Double portfolioSize = 0.0;
     private Double portfolioBasis= 0.0;
 
     public Portfolio()
 
     {
-
-        investments = new ArrayList<>();
         // put some stub investments into the portfolio
         Investment inv = new Investment();
         inv.setSymbol("FNMIX");
@@ -37,7 +36,8 @@ public class Portfolio {
         inv.setDescription("Fidelity Floating Rate High Income Fund");
         investments.add(inv);
         inv.setTargetPct(7.5);
-        System.out.println(investments.toString());
+
+
     }
 
     public void add(Investment investment) {
@@ -64,7 +64,7 @@ public class Portfolio {
 
     }
 
-    public void bucketize() {
+    public void bucketize(BucketConfiguration bucketConfiguration) {
 
 
         for (Investment inv: investments) {
@@ -79,67 +79,50 @@ public class Portfolio {
             if (price == 1.0) {
                 bucket1.add(inv);
             } else {
-                switch (symbol) {
-                    case "FLTB" :
-                        inv.setTargetPct(7.5);
-                        bucket2.add(inv);
-                        break;
-                    case "ITOT":
-                        inv.setTargetPct(10.);
-                        bucket3.add(inv);
-                        break;
-                    case "IUSB":
-                        inv.setTargetPct(15.0);
-                        bucket2.add(inv);
-                        break;
-                    case "IXUS":
-                        inv.setTargetPct(8.0);   // this plus VEU is 9%
-                        bucket3.add(inv);
-                        break;
-                    case "STIP":
-                        inv.setTargetPct(12.5);  // this plus VTIP is 20%
-                        bucket2.add(inv);
-                        break;
-                    case "VEU":
-                        inv.setTargetPct(0.0);
-                        bucket3.add(inv);
-                        break;
-                    case "IJR":
-                        inv.setTargetPct(2.0);
-                        bucket3.add(inv);
-                        break;
-                    case "VIG":  // vig position is split across bucket 2 and 3
+                // find the symbol in the bucket configuration
+                InvestmentAllocation ia = bucketConfiguration.get(symbol);
+                if (ia != null) {
+                    if (!ia.isSplit()){
+                        if (ia.getBucket1Pct() > 0.0) {
+                            inv.setTargetPct(ia.getBucket1Pct());
+                            bucket1.add(inv);
+
+                        } else if (ia.getBucket2Pct() > 0.0) {
+                            inv.setTargetPct(ia.getBucket2Pct());
+                            bucket2.add(inv);
+                        } else if (ia.getBucket3Pct() > 0.0) {
+                            inv.setTargetPct(ia.getBucket3Pct());
+                            bucket3.add(inv);
+                        }
+                        else {
+                            // stick it in bucket4, the unbucketed bucket.
+                            // all bucket pct values are 0...
+                            inv.setTargetPct(0.0);
+                            unBucketed.add(inv);
+                        }
+
+                    } else {
+                        // this investment is split between buckets 2 and 3
+
+                        //inv will be used for bucket2, its clone will be used for bucket3
+
                         Investment clone = new Investment(inv);
-                        inv.sell(45.0);
-                        clone.sell(55.0);
-                        inv.setTargetPct(12.5);
+                        clone.sell(ia.getBucket3AllocationPct());
+                        inv.sell(ia.getBucket2AllocationPct()); // sell takes a 'fraction' not a pct. so something like .5655 not 56.5%
+                        inv.setTargetPct(ia.getBucket2Pct());
+                        clone.setTargetPct(ia.getBucket3Pct());
                         bucket2.add(inv);
-                        clone.setTargetPct(10.0);
                         bucket3.add(clone);
-                        break;
-                    case "VTIP":
-                        inv.setTargetPct(0.0);
-                        bucket2.add(inv);
-                        break;
-                    case "FACFC":
-                        annuity.add(inv);
-                        break;
-                    case "FNMIX":
-                        inv.setTargetPct(2.5);
-                        bucket3.add(inv);
-                        break;
-                    case "FAGIX":
-                        inv.setTargetPct(2.5);
-                        bucket3.add(inv);
-                        break;
-                    case "FFHRX":
-                        inv.setTargetPct(7.5);
-                        bucket2.add(inv);
-                        break;
-                    default:
-                        System.out.println("unknown investment!" + inv.toString());
+
+                    }
+
+
+                } else {
+                    inv.setTargetPct(0.0);
+                    unBucketed.add(inv);
 
                 }
+
             }
         }
 
@@ -173,6 +156,9 @@ public class Portfolio {
         System.out.println ("+");
         System.out.println (" Bucket3: " + String.format("%.2f", bucket3.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket3.getBucketSize()/sizeWOAnnuity) + " Target: 35%");
         bucket3.printBucket(sizeWOAnnuity);
+        System.out.println ("+");
+        System.out.println (" Unbucketed: " + String.format("%.2f", unBucketed.getBucketSize()));
+        unBucketed.printBucket(sizeWOAnnuity);
         System.out.println ("+");
         System.out.println (" Annuity: " + String.format("%.2f", annuity.getBucketSize()));
         System.out.println ("+");
