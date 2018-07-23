@@ -24,6 +24,7 @@ public void add(String csvItem) {
 }
 
 public void print(){
+    System.out.println("Bucket Configuration: ");
     for (InvestmentAllocation ia: allocations) {
         System.out.println(ia.toString());
     }

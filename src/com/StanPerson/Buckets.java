@@ -92,7 +92,6 @@ public class Buckets {
             while(inputStream.hasNextLine()){
                 String line= inputStream.nextLine();
                 if (line.isEmpty()) break;
-                System.out.println( line);
                 lines.add(line);
             }
 
@@ -112,7 +111,6 @@ public class Buckets {
         List <String> portfolioPlan = readPortfolioPlan(portfolioPlanPath);
 
         for (String line : portfolioPlan) {
-            System.out.println(line);
             bucketConfiguration.add(line);
         }
         bucketConfiguration.print();

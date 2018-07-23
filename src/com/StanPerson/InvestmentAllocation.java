@@ -50,8 +50,7 @@ public class InvestmentAllocation {
 
     @Override
     public String toString() {
-        return "InvestmentAllocation{" +
-                "ticker='" + ticker +
+        return  "ticker='" + ticker +
                 ", description='" + description +
                 ", bucket1Pct=" + bucket1Pct +
                 ", bucket2Pct=" + bucket2Pct +
