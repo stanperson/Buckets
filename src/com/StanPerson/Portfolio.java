@@ -148,7 +148,9 @@ public class Portfolio {
         System.out.println ("Cost Basis: " + String.format("%.2f", portfolioBasis));
         System.out.println ("Unrealized Profits: " + String.format("%.2f", (portfolioSize -portfolioBasis)));
         System.out.println ("+");
-        System.out.println (" Bucket1: " + String.format("%.2f", bucket1.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket1.getBucketSize()/sizeWOAnnuity) + " Target: " + String.format("%.1f", 100.* bucketConfiguration.getBucketFractionOfPortfolio(0)) + " Out of balance by: "+ String.format("%.2f", (.1 * sizeWOAnnuity) - bucket1.getBucketSize()) );
+        System.out.println (" Bucket1: " + String.format("%.2f", bucket1.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket1.getBucketSize()/sizeWOAnnuity)
+                + " Target: " + String.format("%.1f", 100.* bucketConfiguration.getBucketFractionOfPortfolio(0))
+                + " Out of balance by: "+ String.format("%.2f", (bucketConfiguration.getBucketFractionOfPortfolio(0) * sizeWOAnnuity) - bucket1.getBucketSize()) );
         bucket1.printBucket(sizeWOAnnuity);
         System.out.println ("+");
         System.out.println (" Bucket2: " + String.format("%.2f", bucket2.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket2.getBucketSize()/sizeWOAnnuity) + " Target: " + String.format("%.1f",100* bucketConfiguration.getBucketFractionOfPortfolio(1) ));
