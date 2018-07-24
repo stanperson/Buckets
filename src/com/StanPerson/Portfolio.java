@@ -20,24 +20,6 @@ public class Portfolio {
     public Portfolio()
 
     {
-        // put some stub investments into the portfolio
-        /*
-        Investment inv = new Investment();
-        inv.setSymbol("FNMIX");
-        inv.setDescription("Fidelity New Markets Income Fund");
-        investments.add(inv);
-        inv.setTargetPct(2.5);
-        inv = new Investment();
-        inv.setSymbol("FAGIX");
-        inv.setDescription("Fidelity Capital & Income Fund");
-        investments.add(inv);
-        inv.setTargetPct(2.5);
-        inv = new Investment();
-        inv.setSymbol("FFHRX");
-        inv.setDescription("Fidelity Floating Rate High Income Fund");
-        investments.add(inv);
-        inv.setTargetPct(7.5);
-*/
 
     }
 
@@ -45,14 +27,14 @@ public class Portfolio {
         // check for duplicates...I'm saying that if I have the same investment in two accounts, then it's
         // for the same bucket. I guess. :)
         String ticker = investment.getSymbol();
-        Investment inv2 = this.get(ticker);
+        Investment inv2 = this.get(ticker);         // look in this portfolio and see if there is an investment of same ticker alreaday there.
 
         if ( inv2 != null ) {
-            // there is a matching symbol in the set. Merge the two investments.
+            // there is a matching ticker in the portfolio. Merge the two investments.
             inv2.merge(investment);
 
         } else
-            investments.add(investment);
+            investments.add(investment);    // this is the first of its ticker value.
 
     }
 
@@ -60,6 +42,7 @@ public class Portfolio {
        return investments.get(index);
 
     }
+
     public List<Investment> getInvestments() {
         return investments;
     }
@@ -144,29 +127,29 @@ public class Portfolio {
     public void printBuckets(BucketConfiguration bucketConfiguration) {
         Double sizeWOAnnuity = portfolioSize - annuity.getBucketSize();
 
-        System.out.println ("Portfolio Size: " + String.format("%.2f", portfolioSize));
-        System.out.println ("Cost Basis: " + String.format("%.2f", portfolioBasis));
-        System.out.println ("Unrealized Profits: " + String.format("%.2f", (portfolioSize -portfolioBasis)));
-        System.out.println ("+");
-        System.out.println (" Bucket1: " + String.format("%.2f", bucket1.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket1.getBucketSize()/sizeWOAnnuity)
+        System.out.println ("Total Portfolio Size: $" + String.format("%.2f", portfolioSize));
+        System.out.println ("Cost Basis:           $" + String.format("%.2f", portfolioBasis));
+        System.out.println ("Unrealized Profits:   $" + String.format("%.2f", (portfolioSize -portfolioBasis)));
+        System.out.println ("*");
+        System.out.println (" Bucket1 (Cash):      $" + String.format("%.2f", bucket1.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket1.getBucketSize()/sizeWOAnnuity)
                 + " Target: " + String.format("%.1f", 100.* bucketConfiguration.getBucketFractionOfPortfolio(0))
                 + " Out of balance by: "+ String.format("%.2f", (bucketConfiguration.getBucketFractionOfPortfolio(0) * sizeWOAnnuity) - bucket1.getBucketSize()) );
         bucket1.printBucket(sizeWOAnnuity);
-        System.out.println ("+");
-        System.out.println (" Bucket2: " + String.format("%.2f", bucket2.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket2.getBucketSize()/sizeWOAnnuity) + " Target: " + String.format("%.1f",100* bucketConfiguration.getBucketFractionOfPortfolio(1) ));
+        System.out.println ("*");
+        System.out.println (" Bucket2 (Income):    $" + String.format("%.2f", bucket2.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket2.getBucketSize()/sizeWOAnnuity) + " Target: " + String.format("%.1f",100* bucketConfiguration.getBucketFractionOfPortfolio(1) ));
         bucket2.printBucket(sizeWOAnnuity);
-        System.out.println ("+");
-        System.out.println (" Bucket3: " + String.format("%.2f", bucket3.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket3.getBucketSize()/sizeWOAnnuity) + " Target:  " + String.format("%.1f",100* bucketConfiguration.getBucketFractionOfPortfolio(2)));
+        System.out.println ("*");
+        System.out.println (" Bucket3 (Long Term): $ " + String.format("%.2f", bucket3.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket3.getBucketSize()/sizeWOAnnuity) + " Target:  " + String.format("%.1f",100* bucketConfiguration.getBucketFractionOfPortfolio(2)));
         bucket3.printBucket(sizeWOAnnuity);
-        System.out.println ("+");
-        System.out.println (" Unbucketed: " + String.format("%.2f", unBucketed.getBucketSize()));
+        System.out.println ("*");
+        System.out.println (" Unbucketed:          $" + String.format("%.2f", unBucketed.getBucketSize()));
         unBucketed.printBucket(sizeWOAnnuity);
-        System.out.println ("+");
-        System.out.println (" Annuity: " + String.format("%.2f", annuity.getBucketSize()));
-        System.out.println ("+");
+        System.out.println ("*");
+        System.out.println (" Annuity:             $" + String.format("%.2f", annuity.getBucketSize()));
+        System.out.println ("*");
         Double totalBucketSize = + bucket1.getBucketSize()+ bucket2.getBucketSize() + bucket3.getBucketSize() + annuity.getBucketSize();
 
-        System.out.println ("sum of bucket sizes: " + String.format("%.2f", totalBucketSize ));
+        //System.out.println ("sum of bucket sizes: " + String.format("%.2f", totalBucketSize ));
 
     }
 
