@@ -3,11 +3,15 @@ package com.StanPerson;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.StanPerson.Buckets.portfolio;
+
 // remove test git integration.
 
 
 public class Portfolio {
 
+
+    private String dateDownLoaded="undefined";
     private List<Investment> investments = new ArrayList<>();
     private Bucket bucket1 = new Bucket("1");
     private Bucket bucket2 = new Bucket("2");
@@ -17,11 +21,6 @@ public class Portfolio {
     private Double portfolioSize = 0.0;
     private Double portfolioBasis= 0.0;
 
-    public Portfolio()
-
-    {
-
-    }
 
     public void add(Investment investment) {
         // check for duplicates...I'm saying that if I have the same investment in two accounts, then it's
@@ -45,6 +44,13 @@ public class Portfolio {
 
     public List<Investment> getInvestments() {
         return investments;
+    }
+    public String getDateDownLoaded() {
+        return dateDownLoaded;
+    }
+
+    public void setDateDownLoaded(String dateDownLoaded) {
+        this.dateDownLoaded = dateDownLoaded;
     }
 
     public void bucketize(BucketConfiguration bucketConfiguration) {
@@ -111,6 +117,45 @@ public class Portfolio {
 
     }
 
+    public  void validate(BucketConfiguration bucketConfiguration) {
+        // verify that everything in the portfolio plan is also in the portfolio.
+        // Thus far, the portfolio content is determined by the file from Fidelity (the account info). The plan may have things not in currently in
+        // the Fidelity Portfolio.
+
+        ArrayList<InvestmentAllocation> alls = bucketConfiguration.getAllocations();
+        for (InvestmentAllocation allocation : alls) {
+            String allocationTicker = allocation.getTicker();
+            Investment i = portfolio.get(allocationTicker);
+            if (portfolio.get(allocationTicker) == null) {
+                // the portfolio does not have anything for this allocation
+                System.out.println("adding investment for : " + allocationTicker);
+                Investment newInv = new Investment();
+                newInv.setSymbol(allocationTicker);
+                newInv.setDescription(allocation.getDescription());
+                if (allocation.isSplit()) {
+                    System.out.println("Can't handle split defaults from allocations.Pick a bucket." + allocation.toString());
+                } else {
+                    //find first non zero bucket percentage.
+                    int bucketId = 1;
+                    Double bucketPct = allocation.getBucket1Pct();
+                    if (bucketPct == 0.) {
+                        bucketPct = allocation.getBucket2Pct();
+                        bucketId++;
+                        if (bucketPct == 0.) {
+                            bucketPct = allocation.getBucket3Pct();
+                            bucketId++;
+                        }
+                    }
+                    newInv.setTargetPct(bucketPct);
+                    portfolio.add(newInv);
+                }
+
+
+            }
+
+        }
+    }
+
     public void print() {
         for (Investment inv: investments) {
             System.out.println("   " + inv.toString());
@@ -127,6 +172,7 @@ public class Portfolio {
     public void printBuckets(BucketConfiguration bucketConfiguration) {
         Double sizeWOAnnuity = portfolioSize - annuity.getBucketSize();
 
+        System.out.println("Date downloaded: " + dateDownLoaded);
         System.out.println ("Total Portfolio Size: $" + String.format("%.2f", portfolioSize));
         System.out.println ("Cost Basis:           $" + String.format("%.2f", portfolioBasis));
         System.out.println ("Unrealized Profits:   $" + String.format("%.2f", (portfolioSize -portfolioBasis)));
