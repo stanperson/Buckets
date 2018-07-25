@@ -11,7 +11,7 @@ public class Investment {
     private Double currValue = 0.;
     private Double costBasis = 0.;
     private Double targetPct = 0.;
-    private String type = "default";
+    private String invClass = "Cash";
 
     /*
         csv from Fidelity has the first line set to:
@@ -76,6 +76,14 @@ public class Investment {
         this.costBasis = (fraction * this.costBasis);
     }
 
+    public String getInvClass() {
+        return invClass;
+    }
+
+    public void setInvClass(String invClass) {
+        this.invClass = invClass;
+    }
+
     public Double getTargetPct() {
         return targetPct;
     }
@@ -85,7 +93,7 @@ public class Investment {
     }
 
     public String toString(){
-        return " " + symbol + "|" + description +"|" + ""+quantity + "|" + ""+price + "|" + ""+ currValue + "|" + ""+ costBasis;
+        return " " + symbol + "," + invClass +"," + description +"," +quantity + "," + price + "," +  currValue + "," +  costBasis;
     }
 
     public String getSymbol() {

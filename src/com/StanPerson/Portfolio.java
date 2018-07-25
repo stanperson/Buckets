@@ -3,6 +3,7 @@ package com.StanPerson;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.StanPerson.Buckets.bucketConfiguration;
 import static com.StanPerson.Buckets.portfolio;
 
 // remove test git integration.
@@ -20,6 +21,10 @@ public class Portfolio {
     private Bucket unBucketed = new Bucket("5");
     private Double portfolioSize = 0.0;
     private Double portfolioBasis= 0.0;
+    private Double cashAllocation = 0.0;
+    private Double equityAllocation = 0.0;
+    private Double fixedIncomeAllocation = 0.0;
+    private Double unAllocated = 0.0;
 
 
     public void add(Investment investment) {
@@ -32,9 +37,16 @@ public class Portfolio {
             // there is a matching ticker in the portfolio. Merge the two investments.
             inv2.merge(investment);
 
-        } else
+        } else {
+            // classify the investment as to cash, equity or fixed income.
+            InvestmentAllocation ia = bucketConfiguration.get(ticker);
+            if (ia == null) {
+                investment.setInvClass("Cash");
+            } else {
+                investment.setInvClass(ia.getInvClass());
+            }
             investments.add(investment);    // this is the first of its ticker value.
-
+        }
     }
 
     public Investment get(int index) {
@@ -64,20 +76,38 @@ public class Portfolio {
             portfolioSize += inv.getCurrValue();
             portfolioBasis += inv.getCostBasis();
 
-            // assuming that all cash investments have a current price of $1.00 (true for money market(mostly) and CDs)
-            if (price == 1.0) {
+            // classify the investment
+            String iClass = inv.getInvClass();
+            switch (iClass){
+                case "Cash":
+                    cashAllocation+= inv.getCurrValue();
+                    break;
+                case "Equity":
+                    equityAllocation+=inv.getCurrValue();
+                    break;
+                case "Fixed":
+                    fixedIncomeAllocation+=inv.getCurrValue();
+                    break;
+                default:
+                    unAllocated+=inv.getCurrValue();
+            }
+
+
+            if (inv.getInvClass().equalsIgnoreCase("Cash")) {
+
                 bucket1.add(inv);
             } else {
                 // find the symbol in the bucket configuration
                 InvestmentAllocation ia = bucketConfiguration.get(symbol);
                 if (ia != null) {
                     if (!ia.isSplit()){
-                        if (ia.getBucket1Pct() > 0.0) {
+                        if (ia.getBucket1Pct() > 0.0) { // theoretically something like MINT could go in bucket 1.
                             inv.setTargetPct(ia.getBucket1Pct());
                             bucket1.add(inv);
 
                         } else if (ia.getBucket2Pct() > 0.0) {
                             inv.setTargetPct(ia.getBucket2Pct());
+
                             bucket2.add(inv);
                         } else if (ia.getBucket3Pct() > 0.0) {
                             inv.setTargetPct(ia.getBucket3Pct());
@@ -116,6 +146,8 @@ public class Portfolio {
         }
 
     }
+
+
 
     public  void validate(BucketConfiguration bucketConfiguration) {
         // verify that everything in the portfolio plan is also in the portfolio.
@@ -176,6 +208,10 @@ public class Portfolio {
         System.out.println ("Total Portfolio Size: $" + String.format("%.2f", portfolioSize));
         System.out.println ("Cost Basis:           $" + String.format("%.2f", portfolioBasis));
         System.out.println ("Unrealized Profits:   $" + String.format("%.2f", (portfolioSize -portfolioBasis)));
+        System.out.println ("Cash Allocation:      $" + String.format("%.2f", (cashAllocation)) + " Portfolio%: " + String.format("%.1f", 100.* cashAllocation/portfolioSize));
+        System.out.println ("Fixed Income Alloc:   $" + String.format("%.2f", (fixedIncomeAllocation)) + " Portfolio%: " + String.format("%.1f", 100.* fixedIncomeAllocation/portfolioSize));
+        System.out.println ("Equity Allocation:    $" + String.format("%.2f", (equityAllocation))+ " Portfolio%: " + String.format("%.1f", 100.* equityAllocation/portfolioSize));
+        System.out.println ("Not Allocated:        $" + String.format("%.2f", (unAllocated)));
         System.out.println ("*");
         System.out.println (" Bucket1 (Cash):      $" + String.format("%.2f", bucket1.getBucketSize()) + " Portfolio %: " + String.format("%.2f", 100 * bucket1.getBucketSize()/sizeWOAnnuity)
                 + " Target: " + String.format("%.1f", 100.* bucketConfiguration.getBucketFractionOfPortfolio(0))
@@ -207,6 +243,30 @@ public class Portfolio {
             }
 
         return null;
+    }
+
+    public Double getCashAllocation() {
+        return cashAllocation;
+    }
+
+    public void setCashAllocation(Double cashAllocation) {
+        this.cashAllocation = cashAllocation;
+    }
+
+    public Double getEquityAllocation() {
+        return equityAllocation;
+    }
+
+    public void setEquityAllocation(Double equityAllocation) {
+        this.equityAllocation = equityAllocation;
+    }
+
+    public Double getFixedIncomeAllocation() {
+        return fixedIncomeAllocation;
+    }
+
+    public void setFixedIncomeAllocation(Double fixedIncomeAllocation) {
+        this.fixedIncomeAllocation = fixedIncomeAllocation;
     }
 
     public void del(String symbol) {

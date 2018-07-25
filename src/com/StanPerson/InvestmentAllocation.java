@@ -3,6 +3,7 @@ package com.StanPerson;
 public class InvestmentAllocation {
     private String ticker;
     private String description;
+    private String invClass;
     private Double bucket1Pct;
     private Double bucket2Pct;
     private Double bucket3Pct;
@@ -15,6 +16,14 @@ public class InvestmentAllocation {
 
     public void setSplit(boolean split) {
         this.split = split;
+    }
+
+    public String getInvClass() {
+        return invClass;
+    }
+
+    public void setInvClass(String invClass) {
+        this.invClass = invClass;
     }
 
     public Double getBucket2AllocationPct() {
