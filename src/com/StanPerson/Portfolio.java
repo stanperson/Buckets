@@ -27,6 +27,9 @@ public class Portfolio {
     private Double unAllocated = 0.0;
 
 
+    private Double pendingActivity = 0.0;
+
+
     public void add(Investment investment) {
         // check for duplicates...I'm saying that if I have the same investment in two accounts, then it's
         // for the same bucket. I guess. :)
@@ -208,6 +211,7 @@ public class Portfolio {
         System.out.println ("Total Portfolio Size: $" + String.format("%.2f", portfolioSize));
         System.out.println ("Cost Basis:           $" + String.format("%.2f", portfolioBasis));
         System.out.println ("Unrealized Profits:   $" + String.format("%.2f", (portfolioSize -portfolioBasis)));
+        System.out.println ("Pending Cash:         $" + String.format("%.2f", (pendingActivity)));
         System.out.println ("Cash Allocation:      $" + String.format("%.2f", (cashAllocation)) + " Portfolio%: " + String.format("%.1f", 100.* cashAllocation/portfolioSize));
         System.out.println ("Fixed Income Alloc:   $" + String.format("%.2f", (fixedIncomeAllocation)) + " Portfolio%: " + String.format("%.1f", 100.* fixedIncomeAllocation/portfolioSize));
         System.out.println ("Equity Allocation:    $" + String.format("%.2f", (equityAllocation))+ " Portfolio%: " + String.format("%.1f", 100.* equityAllocation/portfolioSize));
@@ -243,6 +247,13 @@ public class Portfolio {
             }
 
         return null;
+    }
+    public Double getPendingActivity() {
+        return pendingActivity;
+    }
+
+    public void setPendingActivity(Double pendingActivity) {
+        this.pendingActivity = pendingActivity;
     }
 
     public Double getCashAllocation() {

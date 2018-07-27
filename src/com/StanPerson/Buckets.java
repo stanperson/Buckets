@@ -15,8 +15,9 @@ public class Buckets {
     // arg[2]: Portfolio_POsition file. (Default: Any file in PortfolioPositions directory that starts with Portfolio_Position first one).
 
     public static void main(String[] args) {
-        String portfolioPath = "/Users/stanperson/Desktop/PortfolioPositions/";
+        String portfolioPath = "/Users/stanperson/Desktop/PortfolioPositions/";   // directory of portfolio position files as a portfolio plan file
         String portfolioPlan = "PortfolioPlan.csv";
+        Double pendingActivity = 0.0;                // pass in pending activity that doesn't show up in Fidelity Portfolio_posion* files.
 
         if (args.length > 0) {
             System.out.println("args length "+  args.length);
@@ -30,7 +31,9 @@ public class Buckets {
                     case "-plan":
                         portfolioPlan = args[ii+1];
                         System.out.println("setting plan: " + portfolioPlan);
-
+                        break;
+                    case "-pending":
+                        pendingActivity = Double.parseDouble(args[ii+1]);
                         break;
                     default:
                         System.out.println("illegal arguments");
@@ -44,13 +47,12 @@ public class Buckets {
         else
             System.out.println("no args");
 
-        // this is where the Portfolio_Position* and PositionPlan files are stored
 
 
         // read the portfolio allocation plan. If it isn't found this routine will exit.
         bucketConfiguration = readPortfolioPlan(portfolioPath + portfolioPlan);
 
-        portfolio = readFidelityCSV(portfolioPath);
+        portfolio = readFidelityCSV(portfolioPath, pendingActivity);
 
         portfolio.validate(bucketConfiguration);
 

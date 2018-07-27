@@ -15,7 +15,7 @@ public class FileUtilities {
     /*
     Read a CSV file from Fidelity that has current portfolio.
      */
-    public static Portfolio readFidelityCSV(String portfolioPath) {
+    public static Portfolio readFidelityCSV(String portfolioPath, Double pendingActivity) {
         Portfolio portfolio = new Portfolio();
 
         // retrive the name of the files the PortfolioPositions directory
@@ -114,7 +114,15 @@ public class FileUtilities {
             }
             lineNo++;
         }
+        if( pendingActivity != 0.0) {
+            Investment pendingCash = new Investment();
+            pendingCash.setInvClass("Cash");
+            pendingCash.setSymbol("Pending");
+            pendingCash.setCurrValue(pendingActivity);
+            portfolio.add(pendingCash);
+        }
         portfolio.setDateDownLoaded(dateDownloaded);
+        portfolio.setPendingActivity(pendingActivity);
         return portfolio;
     }
 
