@@ -1,5 +1,7 @@
 package com.StanPerson;
 
+import java.util.Scanner;
+
 import static com.StanPerson.Fidelity.FileUtilities.readFidelityCSV;
 import static com.StanPerson.Utility.FileUtilities.readPortfolioPlan;
 
@@ -18,7 +20,7 @@ public class Buckets {
         String portfolioPath = "/Users/stanperson/Desktop/PortfolioPositions/";   // directory of portfolio position files as a portfolio plan file
         String portfolioPlan = "PortfolioPlan.csv";
         Double pendingActivity = 0.0;                // pass in pending activity that doesn't show up in Fidelity Portfolio_posion* files.
-
+        Scanner in = new Scanner (System.in);
         if (args.length > 0) {
             System.out.println("args length "+  args.length);
             for (int ii =0; ii<args.length; ii+=2) {
@@ -26,14 +28,33 @@ public class Buckets {
                 switch ( args[ii].toLowerCase()){
                     case "-path":
                         portfolioPath= args[ii+1];
-                        System.out.println("setting path: " + portfolioPath);
+                        System.out.println("Setting path: " + portfolioPath + " enter over-ride value: ");
+                        String overRide = in.nextLine();
+                        if (!overRide.isEmpty()) {
+                            portfolioPath = overRide;
+                            System.out.println("Path set to:" + portfolioPath);
+                        }
+
                         break;
                     case "-plan":
                         portfolioPlan = args[ii+1];
-                        System.out.println("setting plan: " + portfolioPlan);
+                        System.out.println("setting plan: " + portfolioPlan+ " enter over-ride value: ");
+                        overRide = in.nextLine();
+                        if (!overRide.isEmpty()) {
+                            portfolioPlan = overRide;
+                            System.out.println("Plan set to:" + portfolioPlan);
+                        }
+
                         break;
                     case "-pending":
                         pendingActivity = Double.parseDouble(args[ii+1]);
+                        System.out.println("Pending activity: " + pendingActivity+ " enter over-ride value: ");
+                        overRide = in.nextLine();
+                        if (!overRide.isEmpty()) {
+                            pendingActivity = Double.parseDouble(overRide);
+                            System.out.println("Pending actity set to:" + pendingActivity);
+                        }
+
                         break;
                     default:
                         System.out.println("illegal arguments");
